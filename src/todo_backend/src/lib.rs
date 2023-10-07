@@ -34,9 +34,10 @@ fn read(id: u8) -> Result<String, String> {
 #[update(name = "update")]
 fn update(id: u8, content: String) -> Result<(), String>{
     TODOS.with(|todos| {
-        match todos.borrow().get(&id) {
+        let mut todos_map = todos.borrow_mut();
+        match todos_map.get(&id) {
             Some(_) => {
-                todos.borrow_mut().insert(id, content);
+                todos_map.insert(id, content);
                 Ok(())
             },
             None => Err(format!("Invalid operation. Unable to find the todo with id {}", id).to_string())
@@ -55,7 +56,4 @@ fn delete(id: u8) -> Result<(), String> {
     })
 }
 
-#[ic_cdk::query]
-fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
-}
+ic_cdk::export_candid!();
